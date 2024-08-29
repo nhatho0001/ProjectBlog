@@ -12,7 +12,8 @@ import {BrowserRouter as Router , Routes , Route} from 'react-router-dom'
 import Header from './components/Header'
 import Footers from './components/Footer'
 import PrivateRoute from './components/privateRoute'
-
+import { PrivateCreateProject } from './components/privateCreateProject'
+import CreatePost from './pages/CreatePost'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -26,6 +27,9 @@ function App() {
         <Route path='/signup' element = {<SignUp/>}></Route>
         <Route element = {<PrivateRoute />}>
           <Route path='/dashboard' element= {<Dashboard/>}></Route>
+        </Route>
+        <Route element = {<PrivateCreateProject />}>
+          <Route path='/create-project' element = {<CreatePost />}></Route>
         </Route>
         <Route path='/project' element={<Project/>}></Route>
       </Routes>

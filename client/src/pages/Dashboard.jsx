@@ -17,7 +17,7 @@ export default function Dashboard() {
       <div className='md:w-56'>
         <DashSidebar />
       </div>
-      {tab === 'dashboard' ? <div className='mx-auto'>
+      {tab === 'profile' ? <div className='mx-auto'>
         <DashProfile />
       </div> : undefined }
       

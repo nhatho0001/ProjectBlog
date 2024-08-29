@@ -1,6 +1,6 @@
 import React , {useState ,useEffect ,useRef}from 'react'
 import { useSelector } from 'react-redux'
-import { Label, TextInput } from "flowbite-react";
+import { Label, TextInput , Modal } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { getStorage } from "firebase/storage";
 import { app } from '../Firebase';
@@ -9,8 +9,9 @@ import { Alert } from 'flowbite-react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { upDate } from '../redux/user/userSlice';
+import { upDate , deleteAccountSuccess , deleteAccountFailuer, deleteAccountStart , signOutSuccess, signOutFailure } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 export default function DashProfile() {
     const storage = getStorage(app)
     const [imageFileUploadError, setImageFileUploadError] = useState(null);
@@ -19,8 +20,10 @@ export default function DashProfile() {
     const [imageFile , setImgFile] = useState(null)
     const [imageUrl , setImgUrl] = useState(null)
     const [imageFileUrl, setImageFileUrl] = useState(null);
+    const [openDelete , setOpenDelete] = useState(false)
     const [formData , setInfo] = useState({})
     const filePickerRef = useRef();
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     function handChange(event){
         const {id , value} = event.target;
@@ -97,6 +100,37 @@ export default function DashProfile() {
         
         
     }
+    function handOpenDeleteModel(){
+        dispatch(deleteAccountStart());
+        setOpenDelete(true)
+    }
+    async function deleteAccount() {
+        setOpenDelete(false);
+        try {
+            const response = await fetch(`/api/user/delete/${currentUser._id}`,{
+                method : 'DELETE'
+            });
+            console.log(response)
+            dispatch(deleteAccountSuccess())
+            navigate('/signin')
+        } catch (error) {
+            dispatch(deleteAccountFailuer())
+        }
+    }
+
+    async function handSignOut() {
+        try {
+            const response = await fetch('/api/user/signout' , {
+                method: 'DELETE'
+            })
+            const res = response.json();
+            dispatch(signOutSuccess())
+            console.log(res)
+        } catch (error) {
+            dispatch(signOutFailure(error.message))
+            console.log('fail')
+        }
+    }
 
   return (
         <div className='py-20 mx-auto min-w-96 gap-4 max-w-xl'>
@@ -152,9 +186,21 @@ export default function DashProfile() {
                     Update
                 </Button>
             </form>
+            <Modal show={openDelete} onClose={()=>{setOpenDelete(false)}}>
+                <Modal.Header>Delete account</Modal.Header>
+                <Modal.Body>
+                    <p>Are you sure?</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button color="gray" onClick={()=>{setOpenDelete(false)}}>
+                        Cancel
+                    </Button>
+                    <Button color="failure" onClick={deleteAccount} > Delete</Button>
+                </Modal.Footer>
+            </Modal>
             <div className='flex justify-between text-red-600'>
-                <p>Delete Acoount</p>
-                <p>Sign out</p>
+                <span onClick={handOpenDeleteModel} className='cursor-pointer'>Delete Acoount</span>
+                <span onClick={handSignOut} className='cursor-pointer'>Sign out</span>
             </div>
         </div>
   )

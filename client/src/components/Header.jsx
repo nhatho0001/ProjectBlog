@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Avatar } from "flowbite-react";
 import { Dropdown } from "flowbite-react";
 import {
-    signOut
+    signOutSuccess, signOutFailure 
   } from '../redux/user/userSlice';
 import {
     toggleTheme
@@ -21,9 +21,18 @@ export default function Header() {
     const {theme} = useSelector(state => state.theme)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    function handSignOut() {
-        dispatch(signOut())
-        navigate('/signin')
+    async function handSignOut() {
+        try {
+            const response = await fetch('/api/user/signout' , {
+                method: 'DELETE'
+            })
+            const res = response.json();
+            dispatch(signOutSuccess())
+            console.log(res)
+        } catch (error) {
+            dispatch(signOutFailure(error.message))
+            console.log('fail')
+        }
     }
     function handDark(){
         dispatch(toggleTheme())
@@ -46,7 +55,7 @@ export default function Header() {
                     <span className="block text-sm">{currentUser.username}</span>
                     <span className="block truncate text-sm font-medium">{currentUser.email}</span>
                 </Dropdown.Header>
-                <Dropdown.Item>Dashboard</Dropdown.Item>
+                <Link to={'/dashboard'}><Dropdown.Item as = {'div'}>Dashboard</Dropdown.Item></Link>
                 <Dropdown.Item>Settings</Dropdown.Item>
                 <Dropdown.Item>Earnings</Dropdown.Item>
                 <Dropdown.Item onClick={handSignOut}>Sign out</Dropdown.Item>

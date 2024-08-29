@@ -1,5 +1,5 @@
 import express from "express";
-import { getAPI , uploadUser} from "../controllers/user.controller.js";
+import { getAPI , uploadUser , deleteUser ,signout} from "../controllers/user.controller.js";
 import { verifyUser } from "../utils/verifyUser.js";
 
 
@@ -7,5 +7,7 @@ const router = express.Router();
 
 router.get('/test' ,getAPI);
 router.put('/upload/:id' ,verifyUser, uploadUser);
+router.delete('/delete/:id' , verifyUser , deleteUser);
+router.delete('/signout' , signout)
 
 export default router;

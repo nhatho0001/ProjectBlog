@@ -1,6 +1,7 @@
 import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs"
 import User from "../models/user.model.js";
+import jwt from 'jsonwebtoken';
 const saltRounds = 10;
 export async function getAPI(req , res) {
     res.json({messager : 'API is working'});
@@ -53,4 +54,24 @@ export async function uploadUser(req , res , next) {
     }catch(error){
         next(error)
     }
+}
+
+export async function deleteUser(req , res , next) {
+  if(req.user.id !== req.params.id){
+    return next(errorHandler('400' , "You can't delete account"))
+  };
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.status(200).json('User has been deleted');
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function signout(req , res , next) {
+  try {
+    res.clearCookie('access_token').status(200).json('Log out successful!')
+  } catch (error) {
+    next(error)
+  }
 }

@@ -34,7 +34,7 @@ export async function signIn(req , res , next) {
        if(!check){
             return next(errorHandler(404 , 'Password is not correct!'))
        }
-       const accessToken = jwt.sign({id: validUser._id} , process.env.ACCESS_TOKEN_SECRET);
+       const accessToken = jwt.sign({id: validUser._id , isAdmin : validUser.isAdmin} , process.env.ACCESS_TOKEN_SECRET);
        const {password: pass , ... rest} = validUser._doc;
        res.status(200).cookie('access_token' , accessToken , {httpOnly: true,}).json(rest);
     } catch (error) {
@@ -47,7 +47,7 @@ export async function Google(req , res , next) {
     try {
         const result = await User.findOne({email});
             if(result){
-                const accessToken = jwt.sign({id : result._id} , process.env.ACCESS_TOKEN_SECRET);
+                const accessToken = jwt.sign({id : result._id , isAdmin : result.isAdmin} , process.env.ACCESS_TOKEN_SECRET);
                 const {password : pass , ...rest} = result._doc
                 res.status(200).cookie('access_token' , accessToken , {httpOnly: true}).json(rest)
             }else{
