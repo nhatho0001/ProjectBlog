@@ -14,11 +14,15 @@ import Footers from './components/Footer'
 import PrivateRoute from './components/privateRoute'
 import { PrivateCreateProject } from './components/privateCreateProject'
 import CreatePost from './pages/CreatePost'
+import UpdatePost from './pages/UpdatePost'
+import PostPage from './pages/PostPage'
+import ScrollToTop from './components/ScrollToTop'
 function App() {
   const [count, setCount] = useState(0)
-
+  
   return (
     <Router>
+      <ScrollToTop/>
       <Header></Header>
       <Routes>
         <Route path='/' element = {<Home />}></Route>
@@ -30,7 +34,9 @@ function App() {
         </Route>
         <Route element = {<PrivateCreateProject />}>
           <Route path='/create-project' element = {<CreatePost />}></Route>
+          <Route path='/update-post/:postId' element = {<UpdatePost />}></Route>
         </Route>
+        <Route path='/post/:postSlug' element={<PostPage></PostPage>}></Route>
         <Route path='/project' element={<Project/>}></Route>
       </Routes>
       <Footers />

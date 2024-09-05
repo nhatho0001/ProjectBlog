@@ -57,11 +57,11 @@ export async function uploadUser(req , res , next) {
 }
 
 export async function deleteUser(req , res , next) {
-  if(req.user.id !== req.params.id){
+  if(req.user.id !== req.params.id && !req.user.isAdmin){
     return next(errorHandler('400' , "You can't delete account"))
   };
   try {
-    await User.findByIdAndDelete(req.user.id);
+    await User.findByIdAndDelete(req.params.id);
     res.status(200).json('User has been deleted');
   } catch (error) {
     next(error)
@@ -75,3 +75,56 @@ export async function signout(req , res , next) {
     next(error)
   }
 }
+
+export async function getUsers(req , res , next){
+  if(!req.user.isAdmin) return next(errorHandler(403 , 'You are not allowed to see all users'))
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === 'asc' ? 1 : -1;
+
+    const users = await User.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    const usersWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
+      return rest;
+    });
+
+    const totalUsers = await User.countDocuments();
+
+    const now = new Date();
+
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: oneMonthAgo },
+    });
+
+    res.status(200).json({
+      users: usersWithoutPassword,
+      totalUsers,
+      lastMonthUsers,
+    });
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+    const { password, ...rest } = user._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
