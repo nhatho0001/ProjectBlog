@@ -1,6 +1,8 @@
 import React , {useState , useEffect} from 'react'
 import { Link } from 'react-router-dom'
 import PostCard from '../components/PostCard.jsx'
+import ListImgTopic from '../../public/data/ListImgTopic.js';
+import { Carousel } from 'flowbite-react';
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -15,7 +17,7 @@ export default function Home() {
   }, []);
   return (
     <div>
-      <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto '>
+      <div className='flex flex-col gap-6 p-10 px-3 max-w-6xl mx-auto '>
         <h1 className='text-3xl font-bold lg:text-6xl'>Welcome to my Blog</h1>
         <p className='text-gray-500 text-xs sm:text-sm'>
           Here you'll find a variety of articles and tutorials on topics such as
@@ -28,6 +30,15 @@ export default function Home() {
           View all posts
         </Link>
         </div>
+        
+      <div className="h-56 max-w-6xl pb-10 mx-auto sm:h-64 xl:h-80 2xl:h-96">
+          <Carousel>
+            {ListImgTopic.map(item => {
+              return <img key={item._id} src={item.pathImg} alt={item.category} />
+            })}
+          </Carousel>
+      </div>
+
         <div className='min-w-max mx-auto p-3 flex flex-col gap-8 py-7'>
         {posts && posts.length > 0 && (
           <div className='flex flex-col gap-6'>
